@@ -9,7 +9,7 @@
           <h2>后台管理系统</h2>
         </el-col>
         <el-col :span="2">
-          <el-button plain>退出</el-button>
+          <el-button plain @click="logout">退出</el-button>
         </el-col>
       </el-row>
     </el-header>
@@ -41,7 +41,22 @@
 
 <script>
 export default {
-  name: "index"
+  name: "index",
+  methods: {
+    logout () {
+      // 删除本地缓存中的token
+      window.sessionStorage.removeItem('token')
+      // 用编程式导航跳去登录页
+      this.$router.push('/login')
+    }
+  },
+  // 用最早执行的钩子函数执行登录判断
+  beforeCreate() {
+    if (!(window.sessionStorage.getItem('token'))) {
+      this.$message.error('请先登录')
+      this.$router.push('/login')
+    }
+  },
 };
 </script>
 

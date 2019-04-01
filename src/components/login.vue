@@ -48,9 +48,21 @@ export default {
   },
   methods: {
     submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate(async valid => {
         if (valid) {
-            // 直接提交
+            // 使用async和await修正异步操作
+            let res = await this.$axios.post("login",this.loginForm)
+            // console.log(res);
+            if (res.data.meta.status === 400) {
+              this.$message.error(res.data.neta.msg);
+            } else if (res.data.meta.status === 200) {
+              // 弹出饿了么ui提示框
+              this.$message.success(res.data.meta.msg);
+              // 将token数据缓存在本地浏览器中
+              window.sessionStorage.setItem("token",res.data.data.token);
+              // 编程式导航跳转到主页
+              this.$router.push('/')
+            }
         } else {
           // 饿了么ui的弹出框
           this.$message.error("数据格式错误, 请根据提示修改");
