@@ -15,18 +15,18 @@
     </el-header>
     <el-container class="my-container">
       <el-aside width="200px" class="my-aside">
-          <!-- 写上router才能使用路由功能 -->
-        <el-menu router default-active="2" class="el-menu-vertical-demo">
-          <el-submenu index="1">
+          <!-- 写上router才能使用路由功能, default-active设置默认打开的列表项 -->
+        <el-menu router default-active="users" class="el-menu-vertical-demo">
+          <el-submenu :index="String(item.id)" v-for="(item,index) in menuList" :key="index">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>导航一</span>
+              <span>{{item.authName}}</span>
             </template>
             <el-menu-item-group>
                 <!-- index定义路由跳转到的页面 -->
-              <el-menu-item index="users">
+              <el-menu-item :index="it.path" v-for="(it,index) in item.children" :key="index">
                 <i class="el-icon-menu"></i>
-                <span>选项1</span>
+                <span>{{it.authName}}</span>
               </el-menu-item>
             </el-menu-item-group>
           </el-submenu>
@@ -42,6 +42,12 @@
 <script>
 export default {
   name: "index",
+  data() {
+    return {
+      // 左侧导航列表
+      menuList: []
+    }
+  },
   methods: {
     logout () {
       // 删除本地缓存中的token
@@ -56,6 +62,11 @@ export default {
       this.$message.error('请先登录')
       this.$router.push('/login')
     }
+  },
+  // 在创建元素的钩子函数中获取导航数据
+  async created() {
+    let res = await this.$axios.get('menus')
+    this.menuList = res.data.data;
   },
 };
 </script>
