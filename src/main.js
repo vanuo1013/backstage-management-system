@@ -9,6 +9,10 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 
+// 全局注册面包屑导航组件
+import bread from './components/bread.vue'
+Vue.component('bread',bread)
+
 import axios from 'axios'
 // 设置基地址
 axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/'

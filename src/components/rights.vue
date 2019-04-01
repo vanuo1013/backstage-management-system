@@ -1,80 +1,14 @@
 <template>
   <div class="users">
     <!-- 面包屑导航 -->
-    <bread sectitle="用户管理" threetitle="用户列表"></bread>
-    <!--输入框 -->
-    <el-row>
-      <!-- 组件上添加原生事件需要设置native修饰符 -->
-      <el-col :span="6">
-        <el-input
-          placeholder="请输入内容"
-          v-model="sendData.query"
-          class="input-with-select"
-          @keyup.native.enter="search"
-        >
-          <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-        </el-input>
-      </el-col>
-      <el-col :span="12">
-        <!-- 点击事件中控制弹出框的显示 -->
-        <el-button plain @click="addFormVisible = true">添加用户</el-button>
-      </el-col>
-    </el-row>
+    <bread sectitle="权限管理" threetitle="权限列表"></bread>
     <!-- 表格 -->
     <el-table :data="userList" style="width: 100%" border>
       <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column prop="username" label="姓名" width="180"></el-table-column>
-      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
-      <el-table-column prop="mobile" label="电话"></el-table-column>
-      <el-table-column prop="mg_state" label="用户状态">
-        <!-- slot-scope是组件中的插槽, 通过这个属性双向绑定可获得这一行的所有数据 -->
-        <template slot-scope="scope">
-          <!-- 给开关绑定自带的change事件, 传入这一行的所有数据 -->
-          <el-switch
-            v-model="scope.row.mg_state"
-            @change="stateChange(scope.row)"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-          ></el-switch>
-        </template>
-      </el-table-column>
-      <!-- 自定义列模板中可以放任何组件 -->
-      <el-table-column label="操作">
-        <template slot-scope="scope">
-          <!-- 通过scope.$index 获取索引 scope.row获取这一行的数据 -->
-          <el-button
-            type="primary"
-            size="mini"
-            icon="el-icon-edit"
-            @click="handleEdit(scope.$index, scope.row)"
-            plain
-          ></el-button>
-          <el-button
-            type="danger"
-            size="mini"
-            icon="el-icon-delete"
-            @click="delOne(scope.row)"
-            plain
-          ></el-button>
-          <el-button
-            type="warning"
-            size="mini"
-            icon="el-icon-check"
-            @click="showRole(scope.row)"
-            plain
-          ></el-button>
-        </template>
-      </el-table-column>
+      <el-table-column prop="username" label="权限名称" width="180"></el-table-column>
+      <el-table-column prop="email" label="路径" width="180"></el-table-column>
+      <el-table-column prop="email" label="层级" width="180"></el-table-column>
     </el-table>
-    <!-- 分页器 -->
-    <el-pagination
-      :page-sizes="[10, 20, 30, 40]"
-      :page-size="sendData.pagesize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      @current-change="currentChange"
-      @size-change="sizeChange"
-    ></el-pagination>
     <!-- 新增用户弹出框 -->
     <el-dialog title="添加用户" :visible.sync="addFormVisible">
       <el-form :model="addForm" :rules="addRules" ref="addForm">
