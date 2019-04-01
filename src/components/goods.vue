@@ -1,14 +1,62 @@
 <template>
   <div class="users">
     <!-- 面包屑导航 -->
-    <bread sectitle="权限管理" threetitle="权限列表"></bread>
+    <bread sectitle="商品管理" threetitle="商品列表"></bread>
+    <!--输入框 -->
+    <el-row>
+      <!-- 组件上添加原生事件需要设置native修饰符 -->
+      <el-col :span="6">
+        <el-input
+          placeholder="请输入内容"
+          v-model="sendData.query"
+          class="input-with-select"
+          @keyup.native.enter="search"
+        >
+          <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+        </el-input>
+      </el-col>
+      <el-col :span="12">
+        <!-- 点击事件中控制弹出框的显示 -->
+        <el-button plain @click="addFormVisible = true">添加商品</el-button>
+      </el-col>
+    </el-row>
     <!-- 表格 -->
     <el-table :data="userList" style="width: 100%" border>
       <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column prop="username" label="权限名称"></el-table-column>
-      <el-table-column prop="email" label="路径"></el-table-column>
-      <el-table-column prop="email" label="层级"></el-table-column>
+      <el-table-column prop="username" label="商品名称"></el-table-column>
+      <el-table-column prop="email" label="商品价格(元)" width="150"></el-table-column>
+      <el-table-column prop="mobile" label="商品重量" width="150"></el-table-column>
+      <el-table-column prop="mobile" label="创建时间" width="200"></el-table-column>
+      <!-- 自定义列模板中可以放任何组件 -->
+      <el-table-column label="操作" width="150">
+        <template slot-scope="scope">
+          <!-- 通过scope.$index 获取索引 scope.row获取这一行的数据 -->
+          <el-button
+            type="primary"
+            size="mini"
+            icon="el-icon-edit"
+            @click="handleEdit(scope.$index, scope.row)"
+            plain
+          ></el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            icon="el-icon-delete"
+            @click="delOne(scope.row)"
+            plain
+          ></el-button>
+        </template>
+      </el-table-column>
     </el-table>
+    <!-- 分页器 -->
+    <el-pagination
+      :page-sizes="[10, 20, 30, 40]"
+      :page-size="sendData.pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+      @current-change="currentChange"
+      @size-change="sizeChange"
+    ></el-pagination>
     <!-- 新增用户弹出框 -->
     <el-dialog title="添加用户" :visible.sync="addFormVisible">
       <el-form :model="addForm" :rules="addRules" ref="addForm">
@@ -50,27 +98,6 @@
         <el-button @click="editFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
-    <!-- 角色设置弹出框 -->
-    <el-dialog title="用户角色" :visible.sync="roleFormVisible">
-      <el-form :model="editForm">
-        <el-form-item label="当前用户" label-width="100px">{{editUser.username}}</el-form-item>
-        <el-form-item label="请选择角色" label-width="100px">
-          <!-- 这里的双向数据绑定设置role_name使其默认被选中 -->
-          <el-select v-model="editUser.role_name" placeholder="请选择角色">
-            <el-option
-              v-for="item in roleList"
-              :key="item.id"
-              :label="item.roleName"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitRole('editForm')">确 定</el-button>
-        <el-button @click="roleFormVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -105,12 +132,6 @@ export default {
         email: "",
         mobile: ""
       },
-      // 是否显示角色对话框
-      roleFormVisible: false,
-      // 用对象将当前编辑的用户信息存起来
-      editUser: {},
-      // 用户角色列表
-      roleList: [],
       // 表单验证规则
       addRules: {
         username: [
@@ -136,11 +157,6 @@ export default {
       // 将获得的数据存入data中
       this.total = res.data.data.total;
       this.userList = res.data.data.users;
-    },
-    // 开关状态改变
-    stateChange(row) {
-      // 这行的开关状态改变即调用接口修改数据, 查看接口文档
-      this.$axios.put(`users/${row.id}/state/${row.mg_state}`);
     },
     // 提交新增用户
     submitAdd(addForm) {
@@ -206,28 +222,6 @@ export default {
             message: "已取消"
           });
         });
-    },
-    // 点击角色设置按钮
-    async showRole(row) {
-      // 显示角色弹出框
-      this.roleFormVisible = true;
-      // 将当前用户信息存入data的字段中
-      this.editUser = row;
-      // 调用接口获取所有角色列表
-      let res = await this.$axios.get('roles')
-      this.roleList = res.data.data;
-    },
-    // 分配角色信息
-    async submitRole () {
-      // 调用接口根据用户id分配用户角色
-      let res = await this.$axios.put(`users/${this.editUser.id}/role`,{
-        rid: this.editUser.role_name
-      })
-      if (res.data.meta.status === 200) {
-        this.search();
-      }
-      // 修改成功后关闭弹出框
-      this.roleFormVisible = false;
     },
     // 页码改变事件
     currentChange (current) {

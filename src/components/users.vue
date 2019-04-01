@@ -23,10 +23,10 @@
     <!-- 表格 -->
     <el-table :data="userList" style="width: 100%" border>
       <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column prop="username" label="姓名" width="180"></el-table-column>
-      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
+      <el-table-column prop="username" label="姓名"></el-table-column>
+      <el-table-column prop="email" label="邮箱"></el-table-column>
       <el-table-column prop="mobile" label="电话"></el-table-column>
-      <el-table-column prop="mg_state" label="用户状态">
+      <el-table-column prop="mg_state" label="用户状态" width="150">
         <!-- slot-scope是组件中的插槽, 通过这个属性双向绑定可获得这一行的所有数据 -->
         <template slot-scope="scope">
           <!-- 给开关绑定自带的change事件, 传入这一行的所有数据 -->
@@ -39,7 +39,7 @@
         </template>
       </el-table-column>
       <!-- 自定义列模板中可以放任何组件 -->
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="250">
         <template slot-scope="scope">
           <!-- 通过scope.$index 获取索引 scope.row获取这一行的数据 -->
           <el-button

@@ -1,13 +1,39 @@
 <template>
   <div class="users">
     <!-- 面包屑导航 -->
-    <bread sectitle="权限管理" threetitle="权限列表"></bread>
+    <bread sectitle="商品管理" threetitle="商品分类"></bread>
+    <!--输入框 -->
+    <el-row>
+      <el-col :span="12">
+        <!-- 点击事件中控制弹出框的显示 -->
+        <el-button plain @click="addFormVisible = true">添加分类</el-button>
+      </el-col>
+    </el-row>
     <!-- 表格 -->
     <el-table :data="userList" style="width: 100%" border>
-      <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column prop="username" label="权限名称"></el-table-column>
-      <el-table-column prop="email" label="路径"></el-table-column>
-      <el-table-column prop="email" label="层级"></el-table-column>
+      <el-table-column prop="username" label="分类名称"></el-table-column>
+      <el-table-column prop="email" label="级别"></el-table-column>
+      <el-table-column prop="email" label="是否有效"></el-table-column>
+      <!-- 自定义列模板中可以放任何组件 -->
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <!-- 通过scope.$index 获取索引 scope.row获取这一行的数据 -->
+          <el-button
+            type="primary"
+            size="mini"
+            icon="el-icon-edit"
+            @click="handleEdit(scope.$index, scope.row)"
+            plain
+          ></el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            icon="el-icon-delete"
+            @click="delOne(scope.row)"
+            plain
+          ></el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <!-- 新增用户弹出框 -->
     <el-dialog title="添加用户" :visible.sync="addFormVisible">
@@ -48,27 +74,6 @@
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitEdit('editForm')">确 定</el-button>
         <el-button @click="editFormVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
-    <!-- 角色设置弹出框 -->
-    <el-dialog title="用户角色" :visible.sync="roleFormVisible">
-      <el-form :model="editForm">
-        <el-form-item label="当前用户" label-width="100px">{{editUser.username}}</el-form-item>
-        <el-form-item label="请选择角色" label-width="100px">
-          <!-- 这里的双向数据绑定设置role_name使其默认被选中 -->
-          <el-select v-model="editUser.role_name" placeholder="请选择角色">
-            <el-option
-              v-for="item in roleList"
-              :key="item.id"
-              :label="item.roleName"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitRole('editForm')">确 定</el-button>
-        <el-button @click="roleFormVisible = false">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -137,11 +142,6 @@ export default {
       this.total = res.data.data.total;
       this.userList = res.data.data.users;
     },
-    // 开关状态改变
-    stateChange(row) {
-      // 这行的开关状态改变即调用接口修改数据, 查看接口文档
-      this.$axios.put(`users/${row.id}/state/${row.mg_state}`);
-    },
     // 提交新增用户
     submitAdd(addForm) {
       // 饿了么ui的表单验证提交方法, 用async修正回调函数内的异步操作
@@ -206,28 +206,6 @@ export default {
             message: "已取消"
           });
         });
-    },
-    // 点击角色设置按钮
-    async showRole(row) {
-      // 显示角色弹出框
-      this.roleFormVisible = true;
-      // 将当前用户信息存入data的字段中
-      this.editUser = row;
-      // 调用接口获取所有角色列表
-      let res = await this.$axios.get('roles')
-      this.roleList = res.data.data;
-    },
-    // 分配角色信息
-    async submitRole () {
-      // 调用接口根据用户id分配用户角色
-      let res = await this.$axios.put(`users/${this.editUser.id}/role`,{
-        rid: this.editUser.role_name
-      })
-      if (res.data.meta.status === 200) {
-        this.search();
-      }
-      // 修改成功后关闭弹出框
-      this.roleFormVisible = false;
     },
     // 页码改变事件
     currentChange (current) {
