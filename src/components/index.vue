@@ -56,13 +56,13 @@ export default {
       this.$router.push("/login");
     }
   },
-  // 用最早执行的钩子函数执行登录判断
-  beforeCreate() {
-    if (!window.sessionStorage.getItem("token")) {
-      this.$message.error("请先登录");
-      this.$router.push("/login");
-    }
-  },
+  // 用最早执行的钩子函数执行登录判断 (已用前置导航守卫实现)
+  // beforeCreate() {
+  //   if (!window.sessionStorage.getItem("token")) {
+  //     this.$message.error("请先登录");
+  //     this.$router.push("/login");
+  //   }
+  // },
   // 在创建元素的钩子函数中获取导航数据
   async created() {
     let res = await this.$axios.get("menus");
